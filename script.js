@@ -1,32 +1,41 @@
-var select = document.querySelectorAll(".currency"),
-input_currency = document.getElementById('input_currency'),
-output_currency = document.getElementById('output_currency');
+const taskInput = document.getElementById("task");
+const addTaskButton = document.getElementById("addTask");
+const taskList = document.getElementById("taskList");
 
-fetch(`https://api.frankfurter.app/currencies`)
-  .then((data) => data.json())
-  .then((data) => {
-    const entries = Object.entries(data);
-    console.log(data)
-	  for (var i = 0; i < entries.length; i++) {
-	    select[0].innerHTML += `<option value="${entries[i][0]}">${entries[i][0]}</option>`;
-	    select[1].innerHTML += `<option value="${entries[i][0]}">${entries[i][0]}</option>`;
-	  }
-   	
+// Add a new task
+addTaskButton.addEventListener("click", function() {
+    const taskText = taskInput.value.trim();
+    if (taskText !== "") {
+        const li = document.createElement("li");
+        li.innerHTML = `
+            <input type="text" class="task-input" value="${taskText}" disabled>
+            <button class="edit-btn">Edit</button>
+            <button class="delete-btn">Delete</button>
+        `;
+        taskList.appendChild(li);
+        taskInput.value = "";
+        alert("Task added successfully.");
+        // Edit task
+        const editButton = li.querySelector(".edit-btn");
+        const taskInputField = li.querySelector(".task-input");
+        editButton.addEventListener("click", function() {
+            if (taskInputField.disabled) {
+                taskInputField.disabled = false;
+                taskInputField.focus();
+                editButton.textContent = "Save";
+                alert("You can now edit the task.");
+            } else {
+                taskInputField.disabled = true;
+                editButton.textContent = "Edit";
+                alert("Task updated successfully.");
+            }
+        });
+
+        // Delete task
+        const deleteButton = li.querySelector(".delete-btn");
+        deleteButton.addEventListener("click", function() {
+            taskList.removeChild(li);
+            alert("Task deleted.");
+        });
+    }
 });
-
-function convert(){
- 	input_currency_val = input_currency.value;
- 	if(select[0].value != select[1].value ){
- 		alert("yes")
- 		const host = 'api.frankfurter.app';
-		fetch(`https://${host}/latest?amount=${input_currency_val}&from=${select[0].value}&to=${select[1].value}`)
-		  .then((val) => val.json())
-    	.then((val) => {
-		    //alert(`10 GBP = ${data.rates.USD} USD`);
-		    output_currency.value = Object.values(val.rates)[0]
-		    console.log(Object.values(val.rates)[0])
-		});
- 	}else{
- 		alert("Peease select two different currencies")
- 	}
-}
